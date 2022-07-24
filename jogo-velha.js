@@ -1,74 +1,103 @@
-const X = "X"; 
-const O = "O"; 
-var vezDoJogador = X; 
- 
- 
-function selecionarArea(posicaoLinha, posicaoColuna) { 
-    if (vezDoJogador == X){ 
-        desenharSimbolo(X, posicaoLinha, posicaoColuna); 
-        verVencedor(); 
-        marcarJogadorAtivo(O); 
-        vezDoJogador = O; 
-    } 
-    else{ 
-        desenharSimbolo(O, posicaoLinha, posicaoColuna); 
-        verVencedor(); 
-        marcarJogadorAtivo(X); 
-        vezDoJogador = X;  
-    } 
-} 
- 
- 
-function verVencedor(){ 
-    const selecionarArea = document.querySelectorAll(".quadrado-jogo"); 
-        let a1 = selecionarArea [0];  
-        let a2 = selecionarArea [1];  
-        let a3 = selecionarArea [2]; 
-        let a4 = selecionarArea [3];  
-        let a5 = selecionarArea [4];  
-        let a6 = selecionarArea [5];  
-        let a7 = selecionarArea [6];  
-        let a8 = selecionarArea [7];  
-        let a9 = selecionarArea [8];  
-    if(   
-        combinacoes(a1,a2,a3) || 
-        combinacoes(a4,a5,a6) || 
-        combinacoes(a7,a8,a9) || 
- 
-        combinacoes(a1,a5,a9) || 
-        combinacoes(a3,a5,a7) || 
-        combinacoes(a1,a4,a7) || 
- 
-        combinacoes(a2,a5,a8) || 
-        combinacoes(a3,a6,a9) 
- 
-      ) 
-    { 
-            exibirResultado(`O Jogador ${vezDoJogador} venceu!`); 
-    }else{ 
-            checarArea() ? exibirResultado("Empate!"): ''; 
-    } 
-} 
- 
-const quadradoDoJogo = document.querySelectorAll(".quadrado-jogo"); 
- 
-function checarArea(){ 
-for(let i in quadradoDoJogo){ 
-    if(quadradoDoJogo[i].textContent ===''){ 
-        return false; 
-    }        
-} 
-        return true; 
-} 
- 
-function combinacoes(a2, a3, a4){ 
-    if(a2.textContent === a3.textContent && a2.textContent === a4.textContent && a2.textContent !== ""){ 
-        return true;          
-    } 
-        return false; 
-    } 
- 
- 
-function reiniciarJogo() { 
-    location.reload(); 
+const X = "X";
+const O = "O";
+
+let jogadorAtivo = X;
+let areaJogo = [[], [], []];
+let partidaEncerrada = false;
+
+function reiniciarJogo() {}
+
+//jogador venceu
+function valoresIguais(valores, jogador) {
+ return valores.every(function(valor) {
+    return valor === jogadorAtivo;
+  })
 }
+
+function jogadorVenceu(jogadorAtivo) {
+const venceuLinha1 = valoresIguais(
+  [areaJogo[0][0], areaJogo[0][1], areaJogo[0][2]], 
+  jogadorAtivo
+); 
+  const venceuLinha2 = valoresIguais(
+    [areaJogo[1][0], areaJogo[1][1], areaJogo[1][2]], 
+    jogadorAtivo
+);
+  const venceuLinha3 = valoresIguais(
+    [areaJogo[2][0], areaJogo[2][1], areaJogo[0][2]], 
+    jogadorAtivo
+);
+
+const venceuColuna1 = valoresIguais(
+  [areaJogo[0][0], areaJogo[1][0], areaJogo[2][0]], 
+  jogadorAtivo
+);
+
+const venceuColuna2 = valoresIguais(
+  [areaJogo[0][1], areaJogo[1][1], areaJogo[2][1]], 
+  jogadorAtivo
+);
+
+const venceuColuna3 = valoresIguais(
+  [areaJogo[0][2], areaJogo[1][2], areaJogo[2][2]], 
+  jogadorAtivo
+);
+
+const venceuDiagonal1 = valoresIguais(
+  [areaJogo[0][0], areaJogo[1][1], areaJogo[2][2]], 
+  jogadorAtivo
+);
+
+const venceuDiagonal2 = valoresIguais(
+  [areaJogo[0][2], areaJogo[1][1], areaJogo[2][0]], 
+  jogadorAtivo
+);
+
+
+
+  return( 
+     venceuLinha1 ||
+     venceuLinha2 || 
+     venceuLinha3 || 
+     venceuColuna1 || 
+     venceuColuna2 || 
+     venceuColuna3 || 
+     venceuDiagonal1 ||
+     venceuDiagonal2
+  );
+}
+
+function selecionarArea(posicaoLinha, posicaoColuna) {
+  if (partidaEncerrada) {
+    return;
+  }
+  
+
+    const Linha = posicaoLinha -1;
+    const Coluna = posicaoColuna -1;
+
+    //indefinir jogada na mesma área
+    if (areaJogo[Linha][Coluna] !== undefined) {
+        return;
+    }
+    
+    areaJogo[Linha][Coluna] = jogadorAtivo;
+
+
+    //simbolos desenhados
+    desenharSimbolo(jogadorAtivo, posicaoLinha, posicaoColuna);
+
+    if (jogadorVenceu(jogadorAtivo)){
+      exibirResultado("O vencedor foi o jogador " + jogadorAtivo + "!")
+      partidaEncerrada = true;
+    }
+
+    //alternar jogador
+    jogadorAtivo = jogadorAtivo === X ? O : X;
+      marcarJogadorAtivo(jogadorAtivo);
+    }
+
+    //reiniciar jogo
+    function reiniciarJogo(){
+      location.reload();
+    }
